@@ -33,7 +33,7 @@ public class Levenshtein {
     for (int i=1;i<=len1;i++){
       for (int j=1;j<=len2;j++){
 
-        if ( arg1.charAt(i-1) == arg2.charAt(j-1))  {
+        if ( Character.toLowerCase(arg1.charAt(i-1)) == Character.toLowerCase(arg2.charAt(j-1)) )  {
           dists[i][j] = dists[i-1][j-1];
         }
         else {
