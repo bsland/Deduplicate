@@ -50,7 +50,7 @@ public class Deduplicate{
       {
         count = 0;
         name = outer.next();
-        StringBuffer output = new StringBuffer();
+        ArrayList<String> output = new ArrayList<String>();
 
         if (!seen.contains(name)) {
           seen.add(name);
@@ -61,13 +61,16 @@ public class Deduplicate{
 
             if (levenshtein.computeDistance(name,temp) < THRESHOLD) {
               count++;
-              output.append("\""+temp+"\" , "+hash.get(temp)+"\n");
+              output.add(temp);
               seen.add(temp);
             }
           }
 
           if (count>1){
-            System.out.println(output);
+            for (String out : output) {
+              System.out.println("\""+out+"\", "+hash.get(out));
+            }
+            System.out.println("-----");
           }
 
         }
