@@ -9,15 +9,15 @@ public class Deduplicate{
   public static void main(String[] args) throws ClassNotFoundException {
 
     //TODO parameterize
-    final int THRESHOLD = 7;
+    final int THRESHOLD = 4;
 
     Levenshtein levenshtein = new Levenshtein(THRESHOLD);
 
     //TODO PostgreSQL has built-in Levenshtein function
 
 
-    //TODO Get substring names first. But how do we prevent a dumb one from coming up? That problem's unique to Daily.
-    //TODO After substring is solved, O(n^2) space is significantly reduced
+    //TODO Possibly search for any names containing the found name
+    //Is this problem too specific to the daily?
 
     Class.forName("org.sqlite.JDBC");
 
@@ -26,32 +26,46 @@ public class Deduplicate{
 
     try {
       conn = DriverManager.getConnection("jdbc:sqlite:"+args[0]);
-
       Statement statement = conn.createStatement();
-      ResultSet results = statement.executeQuery("Select byline, count(*) from daily group by byline order by count(*) desc;");
 
-    //TODO Is it worth getting the row count from sqlite to initialize this?
+      ResultSet results = statement.executeQuery("SELECT byline, count(*) FROM daily GROUP BY byline ORDER BY count(*) DESC;");
+
+
+      //TODO Is it worth getting the db row count to initialize this?
       LinkedHashMap<String,Integer> hash = new LinkedHashMap<String,Integer>();
 
-      //TODO This implementation is faster than removing entries from
-      //HashMap but requires more space
-      HashSet<String> seen = new HashSet<String>();
-
+      //Fill a map with every byline and it's count.
+      //Note that it's ordered, so the highest count is first.
       while (results.next()) {
         hash.put(results.getString("byline"),results.getInt("count(*)"));
       }
 
-      Iterator outer = hash.keySet().iterator();
-      String name = "Tessa Gellerson";
-      String max = null;
-      ArrayList<String> matches = new ArrayList<String>();
-      for (Iterator<String> iter = hash.keySet().iterator(); iter.hasNext(); ) {
-        String temp = iter.next();
+      HashSet<String> seen = new HashSet<String>();
 
-        if (levenshtein.computeDistance(name,temp) < THRESHOLD) {
-          System.out.println("\""+temp+"\" , "+hash.get(temp));
+      Iterator<String> outer = hash.keySet().iterator();
+      String temp;
+
+      while (outer.hasNext())
+      {
+        String name = outer.next();
+
+        if (!seen.contains(name)) {
+          seen.add(name);
+
+          Iterator<String> inner=hash.keySet().iterator();
+          while(inner.hasNext()) {
+            temp = inner.next();
+
+            if (levenshtein.computeDistance(name,temp) < THRESHOLD) {
+              System.out.println("\""+temp+"\" , "+hash.get(temp));
+              seen.add(temp);
+            }
+          }
+
+          System.out.println("-----");
         }
       }
+
     }
     catch (SQLException e) {
       System.err.println(e.getMessage());
