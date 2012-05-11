@@ -68,7 +68,7 @@ public class Deduplicate{
 
           if (count>1){
             for (String out : output) {
-              System.out.println("\""+out+"\", "+hash.get(out));
+              System.out.println("\'"+out+"\' --"+hash.get(out));
             }
             System.out.println("-----");
           }
