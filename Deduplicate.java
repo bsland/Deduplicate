@@ -9,7 +9,7 @@ public class Deduplicate{
   public static void main(String[] args) throws ClassNotFoundException {
 
     //TODO parameterize
-    final int THRESHOLD = 4;
+    final int THRESHOLD = 3;
 
     Levenshtein levenshtein = new Levenshtein(THRESHOLD);
 
@@ -40,14 +40,17 @@ public class Deduplicate{
         hash.put(results.getString("byline"),results.getInt("count(*)"));
       }
 
-      HashSet<String> seen = new HashSet<String>();
+      HashSet<String> seen = new HashSet<String>(hash.size());
+      String temp;
+      String name;
+      int count;
 
       Iterator<String> outer = hash.keySet().iterator();
-      String temp;
-
       while (outer.hasNext())
       {
-        String name = outer.next();
+        count = 0;
+        name = outer.next();
+        StringBuffer output = new StringBuffer();
 
         if (!seen.contains(name)) {
           seen.add(name);
@@ -57,12 +60,16 @@ public class Deduplicate{
             temp = inner.next();
 
             if (levenshtein.computeDistance(name,temp) < THRESHOLD) {
-              System.out.println("\""+temp+"\" , "+hash.get(temp));
+              count++;
+              output.append("\""+temp+"\" , "+hash.get(temp)+"\n");
               seen.add(temp);
             }
           }
 
-          System.out.println("-----");
+          if (count>1){
+            System.out.println(output);
+          }
+
         }
       }
 
