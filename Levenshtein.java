@@ -21,6 +21,7 @@ public class Levenshtein {
       return Integer.MAX_VALUE;
     }
 
+    //TODO Delete unneeded past rows
     int dists[][] = new int[len1+1][len2+1];
 
     for (int i=0;i<=len1;i++) {
@@ -30,6 +31,7 @@ public class Levenshtein {
       dists[0][j] = j;
     }
 
+    //TODO Wikipedia's idea about only calculating within a diagonal stripe
     for (int i=1;i<=len1;i++){
       for (int j=1;j<=len2;j++){
 
